@@ -226,24 +226,31 @@ Pega aquí el contenido final de tu `docker-compose.yml`:
 
 | Elemento | Explicación |
 |---|---|
-| `services` | |
-| `image` | |
-| `restart` | |
-| `ports` | |
-| `environment` | |
-| `volumes` (dentro del servicio) | |
-| `volumes` (al final del fichero) | |
+| `services` | Define los contenedores que forman la aplicación. |   
+| `image` | Especifica la imagen de Docker que se utilizará para construir y levantar el contenedor|
+| `restart` |Configura la política de reinicio del contenedor. Define si el contenedor debe reiniciarse automáticamente en caso de fallo, caída del sistema o si se detiene de forma inesperada |
+| `ports` | Vincula los puertos del contenedor con los de la máquina host. Permite exponer los servicios al exterior|
+| `environment` |Define las variables de entorno que se inyectarán dentro del contenedor. |
+| `volumes` (dentro del servicio) | Monta una ruta de datos o un volumen específico en este contenedor.|
+| `volumes` (al final del fichero) | Crea y declara volúmenes globales compartidos y gestionados por Docker. Define el espacio de almacenamiento persistente|
 
 1. **¿Por qué basta con escribir `db`?**
+   Docker Compose crea automáticamente una red interna compartida para todos los servicios definidos en el archivo. El nombre del servicio (db) actúa como un nombre de dominio
 2. **¿Sigue instalado WordPress tras `down` y `up`?**
-
+Sí, siempre que uses volúmenes. El comando docker-compose down destruye los contenedores, pero si los datos de la base de datos y de WordPress están mapeados en la sección volumes
 ### Parte 3 · Fase 1
 
 1. **`depends_on`:**
+   Esta directiva establece el orden de arranque de los servicios. Indica que un contenedor (por ejemplo, WordPress) no debe iniciarse hasta que el servicio del que depende (por ejemplo, db) se haya levantado primero.
 2. **¿Por qué `db` y no `localhost`?**
-
+Se utiliza db porque Docker Compose usa un sistema de DNS interno para comunicar contenedores entre sí. 
 ### Parte 3 · Fase 2
 
-1. **`PMA_HOST`, `PMA_USER`, `PMA_PASSWORD`:**
-2. **Contenedores recreados:**
-3. **Riesgo del login automático:**
+1. **`PMA_HOST`,Define la dirección o nombre del servidor de la base de datos. `PMA_USER`, Especifica el nombre de usuario para la autenticación.`PMA_PASSWORD`: Almacena la contraseña correspondiente a dicho usuario.**
+2. **Contenedores recreados: 
+   Reemplazo: Docker detiene, elimina y vuelve a crear el contenedor.
+   Disparador: Ocurre al detectar cambios en el archivo docker-compose.yml.
+   Aplicación: Asegura que las nuevas configuraciones entren en vigor.**
+3. **Riesgo del login automático: 
+   Texto plano: Las credenciales se guardan expuestas sin cifrar.
+   Comando inspect: Cualquier usuario con acceso a Docker puede leerlas fácilmente.**
