@@ -12,3 +12,21 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+
+  code:
+    image: lscr.io/linuxserver/code-server:latest
+    restart: always
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Madrid
+      PASSWORD: examplepass
+    volumes:
+      - ./:/config/workspace
+      - code_config:/config
+    ports:
+      - "8443:8443"
+
+
+volumes:
+  code_config:
