@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de Docker</title>
+<style>
+  @font-face {
+    font-family: 'system-mono';
+    src: local('JetBrains Mono'), local('Menlo'), local('Consolas');
+  }
+
+  :root {
+    --bg: #0c1420;
+    --panel: #121d2e;
+    --panel-alt: #182740;
+    --line: #223049;
+    --text: #e7edf6;
+    --muted: #8496b3;
+    --accent: #2496ed; /* docker blue, earned by subject matter */
+    --accent-dim: #1a5a99;
+    --good: #35c98f;
+    --bad: #ef5a5a;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace;
+    --sans: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 15% 0%, #14233a 0%, var(--bg) 45%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px 80px;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  header {
+    margin-bottom: 28px;
+  }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .kicker::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(36,150,237,0.15);
+  }
+
+  h1 {
+    font-size: 32px;
+    margin: 0 0 8px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  header p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 15px;
+    max-width: 46ch;
+  }
+
+  .terminal {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -30px rgba(0,0,0,0.8);
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #0f1929;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #4a5568; }
+  .dot.y { background: #4a5568; }
+  .dot.g { background: #4a5568; }
+
+  .titlebar span.path {
+    margin-left: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .body-area {
+    padding: 28px 26px 26px;
+  }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .track {
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 26px;
+  }
+
+  .fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.35s ease;
+  }
+
+  .question {
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opt {
+    text-align: left;
+    background: #0f1929;
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .opt:hover:not(:disabled) {
+    border-color: var(--accent-dim);
+    background: #122036;
+  }
+
+  .opt:disabled { cursor: default; }
+
+  .opt .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .opt.correct {
+    border-color: var(--good);
+    background: rgba(53,201,143,0.08);
+  }
+  .opt.correct .tag { border-color: var(--good); color: var(--good); }
+
+  .opt.wrong {
+    border-color: var(--bad);
+    background: rgba(239,90,90,0.08);
+  }
+  .opt.wrong .tag { border-color: var(--bad); color: var(--bad); }
+
+  .explain {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-left: 2px solid var(--accent);
+    background: #0f1929;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: var(--muted);
+    display: none;
+  }
+
+  .explain.show { display: block; }
+  .explain strong { color: var(--text); }
+
+  .next-row {
+    margin-top: 22px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  button.next {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--accent);
+    color: #061019;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+    display: none;
+  }
+
+  button.next.show { display: inline-block; }
+  button.next:hover { background: #3ba6f5; }
+
+  .result {
+    display: none;
+    text-align: center;
+    padding: 10px 4px 4px;
+  }
+
+  .result.show { display: block; }
+
+  .result .score {
+    font-family: var(--mono);
+    font-size: 52px;
+    color: var(--accent);
+    margin: 6px 0 4px;
+    font-weight: 700;
+  }
+
+  .result .verdict {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  button.restart {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 10px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+
+  button.restart:hover { background: rgba(36,150,237,0.08); }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    margin-top: 22px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fill { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">docker --version</div>
+    <h1>Test de Docker</h1>
+    <p>10 preguntas sobre contenedores, imágenes y Dockerfiles. Elige una respuesta para ver si acertaste.</p>
+  </header>
+
+  <div class="terminal">
+    <div class="titlebar">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <span class="path">~/test-docker</span>
+    </div>
+    <div class="body-area">
+
+      <div id="quizScreen">
+        <div class="progress-row">
+          <span id="qCounter">Pregunta 1 / 10</span>
+          <span id="scoreLive">Aciertos: 0</span>
+        </div>
+        <div class="track"><div class="fill" id="fill"></div></div>
+
+        <p class="question" id="questionText"></p>
+        <div class="options" id="optionsArea"></div>
+        <div class="explain" id="explain"></div>
+        <div class="next-row">
+          <button class="next" id="nextBtn">Siguiente →</button>
+        </div>
+      </div>
+
+      <div class="result" id="resultScreen">
+        <div class="score" id="scoreFinal">0/10</div>
+        <div class="verdict" id="verdict"></div>
+        <button class="restart" id="restartBtn">Repetir el test</button>
+      </div>
+
+    </div>
+  </div>
+  <footer>hecho para practicar conceptos de Docker</footer>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "¿Qué es un contenedor Docker?",
+    options: [
+      "Una máquina virtual completa con su propio kernel",
+      "Un proceso aislado que comparte el kernel del sistema anfitrión",
+      "Un archivo de configuración de red",
+      "Un tipo de base de datos"
+    ],
+    correct: 1,
+    explain: "Un contenedor empaqueta una aplicación y sus dependencias, pero comparte el kernel del host en lugar de virtualizar hardware completo, por eso es mucho más ligero que una máquina virtual."
+  },
+  {
+    q: "¿Qué archivo define cómo se construye una imagen Docker?",
+    options: [
+      "docker-compose.yml",
+      ".dockerignore",
+      "Dockerfile",
+      "image.json"
+    ],
+    correct: 2,
+    explain: "El Dockerfile contiene las instrucciones (FROM, RUN, COPY, CMD, etc.) que Docker sigue paso a paso para construir una imagen."
+  },
+  {
+    q: "¿Qué comando construye una imagen a partir de un Dockerfile en el directorio actual?",
+    options: [
+      "docker run .",
+      "docker build .",
+      "docker create .",
+      "docker start ."
+    ],
+    correct: 1,
+    explain: "docker build . lee el Dockerfile del directorio actual y genera una nueva imagen a partir de sus instrucciones."
+  },
+  {
+    q: "¿Para qué sirve un volumen en Docker?",
+    options: [
+      "Para limitar el uso de CPU de un contenedor",
+      "Para persistir datos fuera del ciclo de vida del contenedor",
+      "Para definir variables de entorno",
+      "Para exponer puertos al host"
+    ],
+    correct: 1,
+    explain: "Los volúmenes permiten que los datos sobrevivan aunque el contenedor se elimine, y pueden compartirse entre varios contenedores."
+  },
+  {
+    q: "¿Qué instrucción de Dockerfile especifica la imagen base?",
+    options: [
+      "BASE",
+      "FROM",
+      "IMAGE",
+      "SOURCE"
+    ],
+    correct: 1,
+    explain: "FROM define la imagen base sobre la que se construyen las capas siguientes, por ejemplo FROM node:20-alpine."
+  },
+  {
+    q: "¿Qué hace 'docker-compose up'?",
+    options: [
+      "Elimina todos los contenedores detenidos",
+      "Descarga la última versión de Docker",
+      "Levanta los servicios definidos en docker-compose.yml",
+      "Crea una nueva imagen desde cero"
+    ],
+    correct: 2,
+    explain: "docker-compose up lee el archivo docker-compose.yml y crea/inicia todos los servicios, redes y volúmenes que ahí se definen."
+  },
+  {
+    q: "¿Cuál es la diferencia principal entre una imagen y un contenedor?",
+    options: [
+      "Son términos intercambiables, no hay diferencia",
+      "La imagen es una plantilla estática; el contenedor es una instancia en ejecución de esa imagen",
+      "La imagen solo existe en la nube",
+      "El contenedor se usa solo para pruebas"
+    ],
+    correct: 1,
+    explain: "La imagen es un paquete inmutable de capas; al ejecutarla con 'docker run' se crea un contenedor, que es una instancia viva con su propio estado."
+  },
+  {
+    q: "¿Qué comando lista los contenedores en ejecución?",
+    options: [
+      "docker ls",
+      "docker ps",
+      "docker list",
+      "docker show"
+    ],
+    correct: 1,
+    explain: "docker ps muestra los contenedores activos; con la opción -a también muestra los detenidos."
+  },
+  {
+    q: "¿Qué es Docker Hub?",
+    options: [
+      "Un editor de código integrado en Docker",
+      "Un registro público de imágenes Docker",
+      "Una herramienta de monitoreo de contenedores",
+      "El motor de ejecución de Docker"
+    ],
+    correct: 1,
+    explain: "Docker Hub es un registro donde se publican y descargan imágenes, tanto oficiales como creadas por la comunidad."
+  },
+  {
+    q: "¿Qué hace la instrucción EXPOSE en un Dockerfile?",
+    options: [
+      "Abre automáticamente el puerto en el host",
+      "Documenta qué puerto usa el contenedor, sin publicarlo por sí sola",
+      "Elimina el contenedor tras un tiempo determinado",
+      "Cifra el tráfico de red del contenedor"
+    ],
+    correct: 1,
+    explain: "EXPOSE es informativa: indica qué puerto escucha la app dentro del contenedor. Para publicarlo realmente al host hace falta -p al ejecutar 'docker run'."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+const questionText = document.getElementById('questionText');
+const optionsArea = document.getElementById('optionsArea');
+const explainBox = document.getElementById('explain');
+const nextBtn = document.getElementById('nextBtn');
+const qCounter = document.getElementById('qCounter');
+const scoreLive = document.getElementById('scoreLive');
+const fill = document.getElementById('fill');
+const quizScreen = document.getElementById('quizScreen');
+const resultScreen = document.getElementById('resultScreen');
+const scoreFinal = document.getElementById('scoreFinal');
+const verdict = document.getElementById('verdict');
+const restartBtn = document.getElementById('restartBtn');
+
+function renderQuestion() {
+  answered = false;
+  explainBox.classList.remove('show');
+  nextBtn.classList.remove('show');
+
+  const item = questions[current];
+  questionText.textContent = item.q;
+  qCounter.textContent = `Pregunta ${current + 1} / ${questions.length}`;
+  scoreLive.textContent = `Aciertos: ${score}`;
+  fill.style.width = `${(current / questions.length) * 100}%`;
+
+  optionsArea.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+
+  item.options.forEach((optText, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="tag">${letters[idx]}</span><span>${optText}</span>`;
+    btn.addEventListener('click', () => selectAnswer(idx, btn));
+    optionsArea.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx, btnEl) {
+  if (answered) return;
+  answered = true;
+
+  const item = questions[current];
+  const allBtns = optionsArea.querySelectorAll('.opt');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (idx === item.correct) {
+    score++;
+    btnEl.classList.add('correct');
+  } else {
+    btnEl.classList.add('wrong');
+    allBtns[item.correct].classList.add('correct');
+  }
+
+  scoreLive.textContent = `Aciertos: ${score}`;
+  explainBox.innerHTML = `<strong>${idx === item.correct ? 'Correcto.' : 'No exactamente.'}</strong> ${item.explain}`;
+  explainBox.classList.add('show');
+  nextBtn.classList.add('show');
+  nextBtn.textContent = current === questions.length - 1 ? 'Ver resultado →' : 'Siguiente →';
+}
+
+nextBtn.addEventListener('click', () => {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+});
+
+function showResult() {
+  fill.style.width = '100%';
+  quizScreen.style.display = 'none';
+  resultScreen.classList.add('show');
+  scoreFinal.textContent = `${score}/${questions.length}`;
+
+  let msg;
+  if (score === questions.length) msg = 'Perfecto. Dominas los conceptos básicos de Docker.';
+  else if (score >= questions.length * 0.7) msg = 'Muy bien. Tienes una base sólida sobre Docker.';
+  else if (score >= questions.length * 0.4) msg = 'Vas bien encaminado, repasa algunos conceptos clave.';
+  else msg = 'Conviene repasar lo básico: imágenes, contenedores y Dockerfile.';
+  verdict.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  resultScreen.classList.remove('show');
+  quizScreen.style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+</body>
+</html>
