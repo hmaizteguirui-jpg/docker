@@ -1,6 +1,6 @@
 services:
 
-  # Duplicati
+    # Duplicati
   duplicati:
     image: lscr.io/linuxserver/duplicati:latest
     container_name: duplicati
