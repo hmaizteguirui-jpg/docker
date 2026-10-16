@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  uploader:
+    image: filebrowser/filebrowser:v2.23.0
+    container_name: uploader
+    volumes:
+      - ${RUTA_BASE}:/srv
+    ports:
+      - "${PORT_FILEBROWSER}:80"   # <--- ¡ERROR AQUÍ!
+    restart: unless-stopped
