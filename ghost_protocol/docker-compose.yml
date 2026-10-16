@@ -7,5 +7,10 @@ services:
     volumes:
       - ${RUTA_BASE}:/srv
     ports:
-      - "${PORT_FILEBROWSER}:80"   # <--- ¡ERROR AQUÍ!
+      - "${PORT_FILEBROWSER}:80"  
     restart: unless-stopped
+      
+  firefox:
+    image: jlesage/firefox   # <--- ¡ERROR AQUÍ! Falta algo al final...
+    ports:
+      - "${PORT_FIREFOX}:5800"
