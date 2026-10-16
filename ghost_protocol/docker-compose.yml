@@ -38,4 +38,15 @@ services:
       - "${PORT_LIBREOFFICE}:3000" # <--- ¡ERROR LÓGICO! Este puerto ya está ocupado arriba
       - "3001:3001"
     shm_size: "1gb"
-    restart: unless-stopped      
+    restart: unless-stopped   
+    
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "${PORT_JELLYFIN}:8096"
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - ./jellyfin_config:/config
+    restart: unless-stopped
