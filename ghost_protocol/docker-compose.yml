@@ -6,6 +6,7 @@ services:
     container_name: uploader
     volumes:
       - ${RUTA_BASE}:/srv
+      - ${RUTA_BASE}:/ruta_interna_del_contenedor
     ports:
       - "${PORT_FILEBROWSER}:80"  
     restart: unless-stopped
@@ -14,6 +15,8 @@ services:
     image: jlesage/firefox   # <--- ¡ERROR AQUÍ! Falta algo al final...
     ports:
       - "${PORT_FIREFOX}:5800"
+    volumes:
+      - ${RUTA_BASE}:/ruta_interna_del_contenedor
   obsidian:
     image: lscr.io/linuxserver/obsidian:latest
     container_name: obsidian   # <--- ¡ERROR DE ESCRITURA! Demasiados espacios a la izquierda
@@ -26,7 +29,8 @@ services:
       - "3001:3001"
     shm_size: "1gb"
     restart: unless-stopped
-
+    volumes:
+      - ${RUTA_BASE}:/ruta_interna_del_contenedor
   libreoffice:
     image: lscr.io/linuxserver/libreoffice:latest
     container_name: libreoffice
@@ -36,10 +40,11 @@ services:
       - TZ=Etc/UTC
     ports:
       - "${PORT_LIBREOFFICE}:3000" # <--- ¡ERROR LÓGICO! Este puerto ya está ocupado arriba
-      - "3001:3001"
+      - "3003:3001"
     shm_size: "1gb"
     restart: unless-stopped   
-    
+    volumes:
+      - ${RUTA_BASE}:/ruta_interna_del_contenedor
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
@@ -49,4 +54,5 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ./jellyfin_config:/config
+      - ${RUTA_BASE}:/ruta_interna_del_contenedor
     restart: unless-stopped
