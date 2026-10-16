@@ -6,7 +6,6 @@ services:
     container_name: uploader
     volumes:
       - ${RUTA_BASE}:/srv
-      - ${RUTA_BASE}:/ruta_interna_del_contenedor
     ports:
       - "${PORT_FILEBROWSER}:80"  
     restart: unless-stopped
@@ -16,7 +15,8 @@ services:
     ports:
       - "${PORT_FIREFOX}:5800"
     volumes:
-      - ${RUTA_BASE}:/ruta_interna_del_contenedor
+      - ${RUTA_BASE}:/config/downloads
+      
   obsidian:
     image: lscr.io/linuxserver/obsidian:latest
     container_name: obsidian   # <--- ¡ERROR DE ESCRITURA! Demasiados espacios a la izquierda
@@ -30,7 +30,7 @@ services:
     shm_size: "1gb"
     restart: unless-stopped
     volumes:
-      - ${RUTA_BASE}:/ruta_interna_del_contenedor
+      - ${RUTA_BASE}:/config/redaccion_data
   libreoffice:
     image: lscr.io/linuxserver/libreoffice:latest
     container_name: libreoffice
@@ -44,7 +44,7 @@ services:
     shm_size: "1gb"
     restart: unless-stopped   
     volumes:
-      - ${RUTA_BASE}:/ruta_interna_del_contenedor
+      - ${RUTA_BASE}:/config/redaccion_data
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
@@ -54,5 +54,5 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ./jellyfin_config:/config
-      - ${RUTA_BASE}:/ruta_interna_del_contenedor
+      - ${RUTA_BASE}:/media
     restart: unless-stopped

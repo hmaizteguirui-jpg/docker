@@ -224,8 +224,8 @@ Si has conectado todo bien, sigue estos pasos para superar la práctica:
 4.  **Guardado:** Guarda el documento como `INFORME_FINAL.odt`.
 
 > **🏆 ENTREGA FINAL:**
-> Sube una captura de pantalla donde se vea el **Uploader (Filebrowser)** mostrando el archivo `INFORME_FINAL.odt` que acabas de crear con LibreOffice. Esto demuestra que todos los sistemas están conectados.
-> Sube una captura de pantalla de los contenedores corriendo en Docker Desktop.
+> Sube una captura de pantalla donde se vea el **Uploader (Filebrowser)** mostrando el archivo `INFORME_FINAL.odt` que acabas de crear con LibreOffice. Esto demuestra que todos los sistemas están conectados.![alt text](image-2.png)
+> Sube una captura de pantalla de los contenedores corriendo en Docker Desktop.![alt text](image-3.png)
 > Sube los cambios de este repositorio.
 
 --- 
