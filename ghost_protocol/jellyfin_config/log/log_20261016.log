@@ -582,3 +582,7 @@ PRAGMA temp_store=2;
 [2026-10-16 10:44:52.015 +00:00] [INF] [7] Main: Startup complete 0:00:25.0632732
 [2026-10-16 10:44:52.296 +00:00] [INF] [7] Emby.Server.Implementations.ScheduledTasks.TaskManager: "Clean Transcode Directory" Completed after 0 minute(s) and 0 seconds
 [2026-10-16 10:44:53.401 +00:00] [INF] [19] Emby.Server.Implementations.ScheduledTasks.TaskManager: "Update Plugins" Completed after 0 minute(s) and 1 seconds
+[2026-10-16 10:55:13.384 +00:00] [INF] [3] Emby.Server.Implementations.Session.SessionManager: Sending shutdown notifications
+[2026-10-16 10:55:13.444 +00:00] [INF] [34] Main: Preparing the database for shutdown...
+[2026-10-16 10:55:13.552 +00:00] [INF] [34] Emby.Server.Implementations.ApplicationHost: Disposing "CoreAppHost"
+[2026-10-16 10:55:13.552 +00:00] [INF] [34] Emby.Server.Implementations.ApplicationHost: Disposing "Plugin"
